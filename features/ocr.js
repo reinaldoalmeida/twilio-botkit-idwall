@@ -4,7 +4,7 @@ module.exports = function (controller) {
     const { BotkitConversation } = require("botkit");
     const flow = new BotkitConversation("ocrMessage", controller);
 
-    const idWall = require(path.join(process.cwd(), "scripts", "idWall.js"));
+    const idWall = require(path.join(process.cwd(), "scripts", "idwall.js"));
 
     flow.addAction("ocrMessage");
 
