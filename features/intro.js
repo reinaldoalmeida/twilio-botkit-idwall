@@ -1,67 +1,69 @@
+const process = require("process");
+
 module.exports = function (controller) {
     const { BotkitConversation } = require("botkit");
     const flow = new BotkitConversation("intro", controller);
 
-    flow.addAction("welcomeMessage");
+    flow.addAction("welcome");
 
-    flow.addMessage("Olá, seja bem-vindo(a) 😎", "welcomeMessage");
-
-    flow.addQuestion(
+    flow.addMessage(
         {
             text:
-                "Envie seu RG e/ou CNH para que possamos analisar as informações",
+                "[IMAGE]Olá, seja bem-vindo(a) 😎\
+                \n\nEu sou o _*ZapWall*_ 👮🏻‍♂️\
+                \n\n🚨 Gostaria de demonstrar algumas formas de utilizar o _*WhatsApp em processos de Onbord*_, mantendo a _*privacidade*_ e _*segurança*_ de um cliente.",
+            channelData: {
+                mediaUrl: `${process.env.IMAGE_URL}/zapwall-logo@640x640.png`,
+            },
         },
+        "welcome"
+    );
+
+    flow.addQuestion(
+        "Digite o *número de uma das opções abaixo* que você deseja experimentar:\
+        \n\n1️⃣ OCR - CNH ou RG\
+        \n2️⃣ Face Match\
+        \n3️⃣ CPF Regular\
+        \n4️⃣ CPF + CEP\
+        \n5️⃣ CNPJ Regular\
+        \n6️⃣ CNPJ + CPF\
+        \n7️⃣ P.E.P\
+        \n8️⃣ M.F.A\
+        \n9️⃣ Social Login\
+        \n🔟 WhiteList\
+        \n\n0️⃣ Sair",
         [
             {
-                pattern: new RegExp("^0$"),
-                type: "regex",
+                pattern: "1",
+                type: "string",
                 handler: async (response, convo, bot) => {
                     await bot.cancelAllDialogs();
-                    await bot.beginDialog("exit");
+                    await bot.beginDialog("ocrDocument");
+                },
+            },
+            {
+                pattern: new RegExp("^0$|Sair"),
+                type: "regex",
+                handler: async (response, convo) => {
+                    await convo.cancelAllDialogs();
+                    await convo.gotoThread("exit");
                 },
             },
             {
                 default: true,
-                handler: async (response, convo, bot, message) => {
-                    if (message.media) {
-                        // obtained by middleware
-                        if (message.media.media_type == "image/jpeg") {
-                            const props = convo.vars.props
-                                ? convo.vars.props
-                                : {};
-                            props.media = message.media.media_url;
-                            //
-                            await bot.say(
-                                "_Estamos enviando seus documentos, por favor aguarde ..._"
-                            );
-                            //
-                            // await bot.cancelAllDialogs();
-                            // await bot.beginDialog("ocrMessage", {
-                            //     props,
-                            // });
-                        } else {
-                            await bot.say(
-                                "Por favor, envie uma *foto válida* do seu documento ou 0 para sair!"
-                            );
-                            return await convo.repeat();
-                        }
-                    } else {
-                        await bot.say(
-                            "Por favor, envie uma *foto válida* do seu documento ou 0 para sair!"
-                        );
-                        return await convo.repeat();
-                    }
+                handler: async (response, convo, bot) => {
+                    await bot.say(
+                        "Por favor, digite uma das opções ou 0 para sair!"
+                    );
+                    return await convo.repeat();
                 },
             },
         ],
-        "welcomeMessageDocument",
-        "welcomeMessage"
+        "welcomeMenuChoice",
+        "welcome"
     );
 
-    flow.after(async (results, bot) => {
-        await bot.cancelAllDialogs();
-        await bot.beginDialog("exit");
-    });
+    flow.after(async () => {});
 
     controller.addDialog(flow);
 };
