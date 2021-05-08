@@ -35,10 +35,10 @@ module.exports = function (controller) {
                                 "_Estamos enviando seus documentos, por favor aguarde ..._"
                             );
                             //
-                            await bot.cancelAllDialogs();
-                            await bot.beginDialog("ocrMessage", {
-                                props,
-                            });
+                            // await bot.cancelAllDialogs();
+                            // await bot.beginDialog("ocrMessage", {
+                            //     props,
+                            // });
                         } else {
                             await bot.say(
                                 "Por favor, envie uma *foto válida* do seu documento ou 0 para sair!"
