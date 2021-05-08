@@ -12,7 +12,7 @@ module.exports.createReport = async (document) => {
         data: JSON.stringify({
             matriz: process.env.IDWALL_MATRIZ_OCR,
             parametros: {
-                cnh_imagem_completa: document,
+                doc_imagem_completa: document,
             },
         }),
     };
