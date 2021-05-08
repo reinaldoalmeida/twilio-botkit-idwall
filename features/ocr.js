@@ -10,8 +10,12 @@ module.exports = function (controller) {
 
     flow.before("ocrMessage", async (convo) => {
         const props = convo.vars.props ? convo.vars.props : {};
-        const success = await idWall.postDocument(props.media);
-        if (success) {
+        const createReport = await idWall.createReport(props.media);
+        if (createReport) {
+            const {
+                result: { itens },
+            } = createReport;
+            console.log(itens);
             await convo.gotoThread("ocrMessageSuccess");
         } else {
             await convo.gotoThread("ocrMessageFail");
