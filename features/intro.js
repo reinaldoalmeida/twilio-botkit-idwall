@@ -9,7 +9,7 @@ module.exports = function (controller) {
     flow.addMessage(
         {
             text:
-                "[IMAGE]Olá, seja bem-vindo(a) 😎\
+                "Olá, seja bem-vindo(a) 😎\
                 \n\nEu sou o _*ZapWall*_ 👮🏻‍♂️\
                 \n\n🚨 Gostaria de demonstrar algumas formas de utilizar o _*WhatsApp em processos de Onbord*_, mantendo a _*privacidade*_ e _*segurança*_ de um cliente.",
             channelData: {

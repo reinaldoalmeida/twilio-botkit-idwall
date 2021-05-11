@@ -1,4 +1,3 @@
-
-module.exports.wait = async function wait(time){
-    return new Promise(resolve => setTimeout(resolve, time));
-}
+module.exports.delay = async (time) => {
+    return new Promise((resolve) => setTimeout(resolve, time));
+};

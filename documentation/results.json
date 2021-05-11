@@ -1,0 +1,68 @@
+{
+  result: {
+    atualizado_em: '2021-05-10T20:04:15.633Z',
+    mensagem: string,
+    numero: string,
+    resultado: 'INVALID',
+    documento_ocr: {
+      	status: 'ILEGIVEL',
+      	filename_full: string,
+	"tipo_detectado": "INVALIDO"
+    }
+  }
+}
+
+{
+  result: {
+    atualizado_em: '2021-05-10T20:04:15.633Z',
+    mensagem: string,
+    numero: string,
+    resultado: 'VALID',
+    documento_ocr: {
+	"status":"OK",
+	"nome":string,
+	"cpf": string,
+	"data_de_nascimento": string,
+	"nome_do_pai": string,
+	"nome_da_mae": string,
+	"categoria": "B",
+	"numero_registro": string,
+	"validade": string,
+	"data_primeira_habilitacao": string,
+	"observacoes": string,
+	"data_de_emissao": string,
+	"numero_renach": string,
+	"numero_espelho": string,
+	"permissao": string,
+	"orgao_emissor": string,
+	"local_emissao": string,
+	"estado_emissao": string,
+	"acc":"",
+	"filename_full": string,
+	"tipo_detectado":"CNH"
+	}
+}
+
+{
+  result: {
+    atualizado_em: '2021-05-10T20:04:15.633Z',
+    mensagem: string,
+    numero: string,
+    resultado: 'VALID',
+    documento_ocr: {
+  	status: 'OK',
+  	rg: string,
+  	data_de_expedicao: string,
+  	nome: string,
+  	nome_do_pai: string,
+  	nome_da_mae: string,
+  	naturalidade: string,
+  	data_de_nascimento: string,
+  	doc_origem: string,
+  	cpf: string,
+  	orgao_emissor: string,
+  	estado_emissao: string,
+  	filename_full: string,
+  	tipo_detectado: 'RG'
+	}
+}

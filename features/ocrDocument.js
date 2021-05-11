@@ -5,13 +5,14 @@ module.exports = function (controller) {
     const flow = new BotkitConversation("ocrDocument", controller);
 
     const idWall = require(path.join(process.cwd(), "scripts", "idwall.js"));
+    const wait = require(path.join(process.cwd(), "scripts", "wait.js"));
 
     flow.addAction("ocrDocument");
 
     flow.addMessage(
         {
             text:
-                "[IMAGE]Essa opção é muito interessante! 😎\
+                "Essa opção é muito interessante! 😎\
                 \n\n🚨 Através do *OCR de documentos* eu consigo extrair informações adicionais, como *validade do documento* e a *filiação da pessoa*, além de poder ser um facilitador na hora do preenchimento de dados. 😉\
                 \n\n🚨 Eu consigo também analisar se é um *documento válido* (RG ou CNH), sem que você precise perguntar ao seu cliente.\
                 \n\n🚨 Também faço um processo de checagem e segurança adiconal, *comparando os dados extraidos com um birô* para te oferecer ainda mais segurança",
@@ -25,7 +26,7 @@ module.exports = function (controller) {
     flow.addQuestion(
         {
             text:
-                "[IMAGE]🔍 Agora, envie uma foto de seu *documento de identidade (RG)* ou *Carteira Nacional de Habilitação (CNH)*.\
+                "🔍 Agora, envie uma foto de seu *documento de identidade (RG)* ou *Carteira Nacional de Habilitação (CNH)*.\
             \n\n📷 _*A foto precisa estar como o exemplo acima* e de forma legível, para que possamos *identificar com clareza seu rosto* e o *número de seu CPF*._\
             \n\n0️⃣ Sair",
             channelData: {
@@ -74,7 +75,7 @@ module.exports = function (controller) {
 
     flow.before("ocrDocumentProcess", async (convo, bot) => {
         await bot.say(
-            "_Estou identificando seu documento, por favor aguarde ..._"
+            "_Estou analisando seu documento, por favor aguarde..._\n\n_*Isso pode levar até 15 segundos*_ 😉"
         );
         const props = convo.vars.props ? convo.vars.props : {};
         if (!props.document) {
@@ -83,31 +84,47 @@ module.exports = function (controller) {
         const createReport = await idWall.createReport(
             props.document.media_url
         );
+
         if (createReport) {
-            console.log(createReport);
-            await convo.gotoThread("ocrDocumentProcessSuccess");
+            const {
+                result: { numero: protocol },
+            } = createReport;
+
+            // wait until the status changes from PRE-PROCESSING to PROCESSING
+            // so, even before finalizing, it is already possible to get information -> /parametros
+            await wait.delay(10000); // 10s
+            const paramsReport = await idWall.paramsReport(protocol);
+            const { result } = paramsReport;
+
+            const props = convo.vars.props ? convo.vars.props : {};
+            const { documento_ocr } = result;
+            const { tipo_detectado } = documento_ocr;
+            props.documento_ocr = documento_ocr;
+            props.tipo_detectado = tipo_detectado;
+            if (!tipo_detectado) {
+                const { mensagem: message } = result;
+                props.messageFail = message;
+            }
+
+            convo.setVar("props", props);
+            await bot.cancelAllDialogs();
+            await bot.beginDialog("ocrDocumentFinish", { props: props });
         } else {
             await convo.gotoThread("ocrDocumentProcessFail");
         }
     });
 
-    flow.addMessage("", "ocrDocumentProcess");
+    flow.addMessage(" ", "ocrDocumentProcess");
 
     flow.addMessage(
-        "🔍 Comecei o processo de *digitalização, extração e análise* do seu documento.\
-        \n\nAssim que finalizar avisarei por aqui 😉",
-        "ocrDocumentProcessSuccess"
-    );
-
-    flow.addMessage(
-        "Encontrei um *problema no envio de seus documentos*. Por favor, tente novamente!",
+        {
+            text: () =>
+                `🚨 Encontrei um *problema no envio do seu documento*. Por favor, tente novamente!`,
+        },
         "ocrDocumentProcessFail"
     );
 
-    flow.after(async (results, bot) => {
-        await bot.cancelAllDialogs();
-        await bot.beginDialog("intro");
-    });
+    flow.after(async () => {});
 
     controller.addDialog(flow);
 };

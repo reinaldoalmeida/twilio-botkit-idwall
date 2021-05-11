@@ -44,11 +44,14 @@ module.exports = async (controller) => {
         next();
     });
 
+    // delay for flow control of messages with images
     controller.middleware.send.use((bot, message, next) => {
+        const {
+            channelData: { mediaUrl },
+        } = message;
         let delay = message.text.length * 15;
-        if (message.text.includes("[IMAGE]")) {
+        if (mediaUrl) {
             delay = 3000;
-            message.text = message.text.replace("[IMAGE]", "");
         }
         setTimeout(async () => {
             next();
